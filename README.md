@@ -3,6 +3,14 @@
 
 # changelog
 
+***2024-07-30***
+* Improvement: The plugin will log at startup which version is started
+* Improvement: Logout of cashier user will delete the standard terminal choice when using dynamic terminal choice is active
+* Bugfix: Setting a standard terminal when no receipt was open resulted in an error
+
+provided adyenplugin-1.0.24-FP18 - suitable for CCO FP18 to FP20  
+provided adyenplugin-1.0.24-FP16 - suitable for CCO FP16 & FP17
+
 ***2024-04-12***  
 * Improvement: Actual values of card payments are now entered automatically. Thus, there should be no discrepancies in the daily closing.  
 * Improvement: Chosen standard terminal will be saved even after cashier logged out once.
