@@ -23,11 +23,61 @@ ___
 
 ### Plugin Installation
 
-<!-- **<span style="color:red">Prior to version 1.1.0</span>** -->
+ **<span style="color:red">Prior to version 1.1.0</span>** 
 
-Download the Adyen certificates from [here]([Building a local integration | Adyen Docs](https://docs.adyen.com/point-of-sale/design-your-integration/choose-your-architecture/local/#install-root-cert)), rename them as shown and place them also in the AP folder.
+Download the Adyen certificates from [here]((https://docs.adyen.com/point-of-sale/design-your-integration/choose-your-architecture/local/#install-root-cert)), rename them as shown and place them also in the AP folder.
 
 ![](resources/1000-AP_folder_with_certificates.png)
+
+**<span style="color:red">With version 1.1.0 and later</span>**
+
+Certificates are now automatically provided by the plugin with the certificates that were released by adyen at the day of the plugin release.   
+The plugin will automatically create a java keystore file in CCOs AP folder. 
+
+You can also define a different path to the java keystore containing the adyen certificates as well as a different password with the two new plugin properties:   
+* ADYEN_KEY_STORE_FILE_PATH
+* ADYEN_KEY_STORE_PASSWORD
+   
+![](resources/1200-new_certificate_properties.png)
+
+Please restart CCO if you changed anything related to the key store.
+
+#### Changing certificates in Java Keystore
+
+Certificates usually have a valid to date. In case of the current adyen certificates it is 2048. In the unlikely event, that these certificates   
+need to be updated in the keystore, please follow these instructions. You can also use tools like "[keystore explorer](https://keystore-explorer.org/)" if you are unfamiliar with cli commands.
+   
+##### Certificates to be imported
+  - adyen-live.pem -> **Entry name:** adyen-terminalfleet-live
+  - adyen-test.pem -> **Entry name:** adyen-terminalfleet-test
+
+##### Prerequisites
+
+1. **Java Development Kit (JDK)**
+   1. The "keytool" command-line utility is included in the JDK.
+   2. Ensure JDK is installed and added to your system path.
+   3. If not installed, refer to official documentations on how to install JDK.
+2. **Existing Java Keystore (adyen-cco-plugin.jks)**
+   1. If the file does not exist, it will be created when the adyen plugin is loaded from CCO.
+3. **Keystore Password**
+   1. You must know or be in possession of the keystore password.
+
+##### Steps to import or Update certificates
+
+###### Windows & macOS
+
+1. Open **Command Prompt (cmd.exe)** as Administrator in Windows or the terminal in macOS
+2. Navigate to the directory containing the keystore and the certificates usually CCOs AP folder
+   1. ```cd path\to\APfolder```
+3. Import or update the adyen-live.pem certificate:
+   1. ```keytool -importcert -trustcacerts -alias adyen-terminalfleet-live -file adyen-live.pem -keystore adyen-cco-plugin.jks -storepass YOUR_KEYSTORE_PASSWORD -noprompt```
+4. Import or update the adyen.test.pem certificate:
+   1. ```keytool -importcert -trustcacerts -alias adyen-terminalfleet-test -file adyen-test.pem -keystore adyen-cco-plugin.jks -storepass YOUR_KEYSTORE_PASSWORD -noprompt```
+5. Verify that both certificates are correctly imported:
+   1. ```keytool -list -keystore adyen-cco-plugin.jks -storepass YOUR_KEYSTORE_PASSWORD``` 
+
+Restart CCO and look for any error messages from the plugin while CCO starts up. 
+
 
 ### Adding a store in Adyen backend
 
