@@ -2,11 +2,14 @@
 
 ___
 
-<!--
-**<span style="color:red">IMPORTANT CHANGE</span>**
 
-With Version 1.1.0 of the plugin the handling of the adyen certificates was changed. A java keystore is introduced. 
--->
+**<span style="color:red">IMPORTANT CHANGES</span>**
+
+With Version 1.1.0 of the plugin the handling of the adyen certificates was changed. A java keystore is introduced.
+
+With Version 1.1.1 of the plugin SAP CCO FP16 and FP17 is not supported anymore.
+  
+With Version 1.3.1 the Adyen SAP CCO Integration requires Java 17!
 
 ## Prerequisites
 
@@ -117,7 +120,7 @@ Add a new credit card which will trigger the payment transaction on the adyen te
 ![](/resources/5000-Plugin_Config.png)
 
 | **KEY**                                                             | VALUES                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|---------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ADYEN_ACTIVATE_DYNAMIC_TERMINAL                                     | *true / false*<br/>If *true* is selected, the terminal is not linked to a single POS. When by card at the checkout, the cashier is asked which terminal should be used. This can be usefull, if you use CCO on a tablet and the POS has not a fixed location in the store.<br/><br/>*Note: The API Key has also be provided.*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ADYEN_ACTIVATE_UNREFERENCED_REFUNDS                                 | *true / false*<br/>Handles refunds only allowed with a referenced payment from an older receipt. This has to be activated by Adyen. Please consult your Adyen contact person.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ADYEN_API_KEY                                                       | *XSA2342FEFASFEF*<br/>This can be created in your Adyen backend in the section *Developers / API credentials*.<br/><br/>*Note*: The permission to use the terminal management API has to be activated by Adyen. Please consult your Adyen contact.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
@@ -136,8 +139,36 @@ Add a new credit card which will trigger the payment transaction on the adyen te
 | ADYEN_TERMINAL_CONNECTION_TIMEOUT                                   | *10000*<br/>Value in milliseconds how long the plugin will wait for a connection. If you experience slow network connections in your store, please adjust this timeout accordingly.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | ADYEN_TERMINAL_READ_TIMEOUT                                         | *120000*<br/>Value in milliseconds how long the terminal will wait for the shoppers card to be presented.<br/><br/>*Note: The processing time of a payment transaction is included into this timeout. This means the timeout will also occur, if the card was presented at ms 119999 and the processing takes > 1 ms.*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | ADYEN_PRINT_KEY_FILTER                                              | The terminal will send the merchant and customer payment receipt in a key-value structure. By providing unwanted keys spearated with semicolon, you can hide certain info on the print out. <br/><br/><br/>Available keys can be found [here](https://docs.adyen.com/point-of-sale/basic-tapi-integration/generate-receipts/)<br/><br/>*aid*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ADYEN_USE_TAP_TO_PAY                                                | Flag to activate the Tap2Pay Feature                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ADYEN_PAYMENT_APP_INSTALLATION_ID                                   | Don't set this field. It will be automatically set when the payment app is boarded                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ADYEN_BOARD_PAYMENT_APP_ON_STORE_LEVEL                              | Set this flag if the adyen payments app should be boarded on store level.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ADYEN_KEY_STORE_FILE_PATH                                           | Will be set automatically with the first startup. Change only if needed!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ADYEN_KEY_STORE_PASSWORD                                            | Will be set automatically initially to "changeit". Please consider changing it in a production environment!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
 Restart your CCO instance after the config. If any mandatory plugin property is missing, you will get a warning after the next login.
+
+### Dynamic Terminal Choice
+
+The dynamic terminal choice feature allows the cashier to dynamically select an active adyen terminal on store level.
+In a mobile POS setup, this allows the cashier to work without having to carry a payment terminal, and instead use whichever terminal is currently available nearby.
+Or you could share one terminal for multiple CCO instances. Cashiers can select a standard terminal for all upcoming payment transactions until logout or removed manually.  
+The manual selection or removing can be achieved with the documented quickselection buttons.
+
+To use the dynamic terminal choice feature, the Adyen API key needs to have the following roles. Some may only be activated by adyen itself.  
+Please consult your contact person. 
+  
+  
+* Management API — Stores read
+* Management API — Stores read and write
+* Management API — Terminal actions read
+* Management API — Terminal settings read
+* Management API — Terminal settings read and write
+* Management API — Terminal actions read
+
+Some restrictions may apply:
+
+* Key identifier, passphrase and key version must be the same on store level for all terminals
+
 
 ### Quickselection Buttons
 
@@ -157,6 +188,73 @@ Add a new quickselection button in CCO Manager and add the following string into
 `"event" : { "eventName" : "ADY_REMOVE_STANDARD_TERMINAL_CHOICE" }`
 
 <img src="resources/7100-QS_Std_Terminal.png" title="" alt="" width="655">
+
+## Tap2Pay (Android)
+
+With Version 1.3.0 you can use the Tap2Pay feature on android. Contact Adyen to activate the Tap2Pay functionality for your account.  
+For further info please consult the official adyen docs [here](https://docs.adyen.com/point-of-sale/mobile-android/build/payments-app/).  
+To get SAP Customer Checkout running on android, please contact [Michael Bosch](https://checkout-peak.com/how-to-use-sap-customer-checkout-on-android/) to obtain his CCO-Peak.
+
+### Prerequisites
+
+* Install the adyen payments (test) app via the Google Play Store
+* have a SAP CCO running on android
+* have file system access to the android device.
+* Ensure Android USB-Debugging is off
+* Create an API Key with the role "Adyen Payments App Role" and also create a client key (is created on the same page where the api key is created)
+  ![](resources/1300_client_key_payments_app.png)
+
+### Boarding Process
+
+* After the installation of the adyen payments (test) app please open it once.
+* Ensure the following plugin properties have been set correctly
+    * Company Account
+    * Merchant Account
+    * Key Identifier 
+    * Key Passphrase
+    * Key version
+    * API Key
+    * Keystore file path
+    * Keystore password
+    * Fallback Card
+    * Card Mapping
+    * Use Tap To Pay
+    * Board Payment App on Store level (set to true if payment app should be boarded on store level otherwise it will be boarded on merchant level)
+* Add the Quick selection buttons to a specific quick-selection ui, preferably not the one the cashier uses
+* reboot CCO
+* Make sure no configuration errors occurred after login
+* Click on the board app button
+    * first app switch will appear
+    * the first app switch is used to ask the app for its boarding status
+    * CCO UI will be visible again with a loading indicator
+    * boarding can take some time...
+    * When CCO receives the boarding response the loading indicator will disappear and after some seconds the last app switch will occur
+    * The payment app should now show a screen "Setup complete. Forward to POS App in 5 seconds."
+    * CCO UI is visible again
+    * When the Adyen payment (test) app is now opened it should show a screen "Ready to accept payments".
+    * Note: In some cases it was necessary to close the payment app and open it again after boarding otherwise no payment was possible
+    * Note: In some cases it was also necessary to restart CCO
+    * Note: In some cases it was also necessary to clear the App Cache of the adyen payment (test) app
+
+### Unboarding Process
+
+In case you want to unboard a boarded adyen payment app, please use the following flow:
+
+* Click on unboard app button
+    * No app switch will occur, the app will not accept payment transactions anymore
+    * Note: Once the app is unboarded you will need to uninstall it, download it from the Play Store again and go through the boarding process again
+
+### Quickselection Buttons
+
+Please be aware, that the board and unboard buttons should only be visible for administrative users not for cashiers!
+
+Board app:
+
+`"event" : { "eventName" : "ADY_BOARD_PAYMENT_APP" }`
+
+Unboard app:
+
+`"event" : { "eventName" : "ADY_UNBOARD_PAYMENT_APP" }`
 
 ### Translations
 
@@ -184,6 +282,11 @@ The plugin writes messages into the SAP CCO log file. If any error occurs please
 | ADY:ERR:11007 | The api key was not set           | Set the api key in the plugin properties           |
 
 ## changelog
+
+
+***Changes***
+
+<span style="color:red">The changelog moved to Github Releases!</span>  
 
 ***2024-07-30***
 
