@@ -34,7 +34,7 @@ Download the Adyen certificates from [here]((https://docs.adyen.com/point-of-sal
 
 **<span style="color:red">With version 1.1.0 and later</span>**
 
-Certificates are now automatically provided by the plugin with the certificates that were released by adyen at the day of the plugin release.   
+The plugin now automatically provides certificates with the certificates that were released by adyen at the day of the plugin release.   
 The plugin will automatically create a java keystore file in CCOs AP folder. 
 
 You can also define a different path to the java keystore containing the adyen certificates as well as a different password with the two new plugin properties:   
@@ -143,7 +143,9 @@ Add a new credit card which will trigger the payment transaction on the adyen te
 | ADYEN_PAYMENT_APP_INSTALLATION_ID                                   | Don't set this field. It will be automatically set when the payment app is boarded                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ADYEN_BOARD_PAYMENT_APP_ON_STORE_LEVEL                              | Set this flag if the adyen payments app should be boarded on store level.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | ADYEN_KEY_STORE_FILE_PATH                                           | Will be set automatically with the first startup. Change only if needed!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ADYEN_KEY_STORE_PASSWORD                                            | Will be set automatically initially to "changeit". Please consider changing it in a production environment!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ADYEN_KEY_STORE_PASSWORD                                            | Will be set automatically initially to "changeit". Please consider changing it in a production environment!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ADYEN_USE_CLOUD_CONNECTION                                          | Set to true, if you want to use Cloud Connection feature.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ADYEN_CLOUD_ENDPOINT                                                | This is the endpoint for Cloud Connection. Communication is synchronous. See the current values for test or live here [Adyen Terminal Cloud Connection](https://docs.adyen.com/point-of-sale/design-your-integration/choose-your-architecture/cloud)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | 
 
 Restart your CCO instance after the config. If any mandatory plugin property is missing, you will get a warning after the next login.
 
@@ -224,7 +226,7 @@ To get SAP Customer Checkout running on android, please contact [Michael Bosch](
 * reboot CCO
 * Make sure no configuration errors occurred after login
 * Click on the board app button
-    * first app switch will appear
+    * the first app switch will appear
     * the first app switch is used to ask the app for its boarding status
     * CCO UI will be visible again with a loading indicator
     * boarding can take some time...
@@ -246,7 +248,7 @@ In case you want to unboard a boarded adyen payment app, please use the followin
 
 ### Quickselection Buttons
 
-Please be aware, that the board and unboard buttons should only be visible for administrative users not for cashiers!
+Please be aware that the board and unboard buttons should only be visible for administrative users not for cashiers!
 
 Board app:
 
@@ -255,6 +257,32 @@ Board app:
 Unboard app:
 
 `"event" : { "eventName" : "ADY_UNBOARD_PAYMENT_APP" }`
+
+# Cloud Connection
+
+Cloud Connection enables the use of the terminal as usual, even if it's not connected to the same Wi-Fi as CCO.
+
+## Prerequisites
+
+* Ensure that the following plugin properties have been set correctly
+    * Company Account
+    * Merchant Account
+    * Store ID (if dynamic terminal choice is enabled)
+    * Identifier (can be a user-defined value which matches adyens requirements, is needed for a secure and encrypted communication between CCO and adyen)
+    * Passphrase (same applies to this)
+    * Key version (numerical value, can be set to 1 or any user-defined value)
+    * Fallback terminal serial number (if dynamic terminal choice is disabled)
+    * API Key (the one created earlier)
+    * Keystore file path (will be created automatically on first startup, please double-check if valid)
+    * Keystore password (will be set to "changeit" on first startup, should be changed in the keystore as well as here for prod use)
+    * Fallback Card
+    * Card Mapping
+    * Use Cloud Connection
+    * Cloud Endpoint
+
+## Notes on Payments
+
+The entire user flow for Cloud Connection is the same as for Local Terminal, including dynamic terminal choice.
 
 ### Translations
 
@@ -282,7 +310,6 @@ The plugin writes messages into the SAP CCO log file. If any error occurs please
 | ADY:ERR:11007 | The api key was not set           | Set the api key in the plugin properties           |
 
 ## changelog
-
 
 ***Changes***
 
