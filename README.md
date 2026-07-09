@@ -2,6 +2,9 @@
 
 ___
 
+| :exclamation:  IMPORTANT NOTICE   |
+|----------------------------------------------|
+ **2026-07-09**: We're currently experiencing issues with local terminal connections when using a new SAP Machine version above 17.0.16. To be on the safe side: Do NOT update until further notice. 
 
 **<span style="color:red">IMPORTANT CHANGES</span>**
 
