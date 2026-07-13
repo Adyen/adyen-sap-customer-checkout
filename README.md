@@ -8,7 +8,7 @@ ___
 
 **<span style="color:red">IMPORTANT CHANGES</span>**
 
-With Version 1.1.0 of the plugin the handling of the adyen certificates was changed. A java keystore is introduced.
+With Version 1.1.0 of the plugin the handling of the Adyen certificates was changed. A java keystore is introduced.
 
 With Version 1.1.1 of the plugin SAP CCO FP16 and FP17 is not supported anymore.
   
@@ -37,10 +37,10 @@ Download the Adyen certificates from [here]((https://docs.adyen.com/point-of-sal
 
 **<span style="color:red">With version 1.1.0 and later</span>**
 
-The plugin now automatically provides certificates with the certificates that were released by adyen at the day of the plugin release.   
+The plugin now automatically provides certificates with the certificates that were released by Adyen at the day of the plugin release.   
 The plugin will automatically create a java keystore file in CCOs AP folder. 
 
-You can also define a different path to the java keystore containing the adyen certificates as well as a different password with the two new plugin properties:   
+You can also define a different path to the java keystore containing the Adyen certificates as well as a different password with the two new plugin properties:   
 * ADYEN_KEY_STORE_FILE_PATH
 * ADYEN_KEY_STORE_PASSWORD
    
@@ -50,12 +50,12 @@ Please restart CCO if you changed anything related to the key store.
 
 #### Changing certificates in Java Keystore
 
-Certificates usually have a valid to date. In case of the current adyen certificates it is 2048. In the unlikely event, that these certificates   
+Certificates usually have a valid to date. In case of the current Adyen certificates it is 2048. In the unlikely event, that these certificates   
 need to be updated in the keystore, please follow these instructions. You can also use tools like "[keystore explorer](https://keystore-explorer.org/)" if you are unfamiliar with cli commands.
    
 ##### Certificates to be imported
-  - adyen-live.pem -> **Entry name:** adyen-terminalfleet-live
-  - adyen-test.pem -> **Entry name:** adyen-terminalfleet-test
+  - adyen-live.pem → **Entry name:** adyen-terminalfleet-live
+  - adyen-test.pem → **Entry name:** adyen-terminalfleet-test
 
 ##### Prerequisites
 
@@ -64,7 +64,7 @@ need to be updated in the keystore, please follow these instructions. You can al
    2. Ensure JDK is installed and added to your system path.
    3. If not installed, refer to official documentations on how to install JDK.
 2. **Existing Java Keystore (adyen-cco-plugin.jks)**
-   1. If the file does not exist, it will be created when the adyen plugin is loaded from CCO.
+   1. If the file does not exist, it will be created when the Adyen plugin is loaded from CCO.
 3. **Keystore Password**
    1. You must know or be in possession of the keystore password.
 
@@ -87,7 +87,7 @@ Restart CCO and look for any error messages from the plugin while CCO starts up.
 
 ### Adding a store in Adyen backend
 
-Please log into your adyen account and create a new store for your merchant account.
+Please log into your Adyen account and create a new store for your merchant account.
 
 ![](resources/2000-Store_Overview.png)
 
@@ -99,8 +99,8 @@ Please log into your adyen account and create a new store for your merchant acco
 
 **C:** Add information which is shown on the shopper receipt
 
-Add address and phone number and add the store. Afterwards assign your terminal to your newly created store. 
-To achieve this, go to In-person payments -> Terminals. Click on the button "..." of the terminal and choose "Reassign".
+Add address and phone number and add the store. Afterward assign your terminal to your newly created store. 
+To achieve this, go to In-person payments → Terminals. Click on the button "..." of the terminal and choose "Reassign".
 
 ### Terminal configuration
 
@@ -116,7 +116,7 @@ Start your SAP CCO instance, login as User with administrative privileges and go
 
 ![](resources/4100-Credit_Cards.png)
 
-Add a new credit card which will trigger the payment transaction on the adyen terminal. The card can be called *Adyen* but you can name the new card as you like. Set the visibility of all other cards (except the ones not handled by the payment terminal) to Visible = OFF but keep them active. The *Adyen* card should be visible.
+Add a new credit card which will trigger the payment transaction on the Adyen terminal. The card can be called *Adyen* but you can name the new card as you like. Set the visibility of all other cards (except the ones not handled by the payment terminal) to Visible = OFF but keep them active. The *Adyen* card should be visible.
 
 ### Plugin Configuration
 
@@ -127,24 +127,24 @@ Add a new credit card which will trigger the payment transaction on the adyen te
 | ADYEN_ACTIVATE_DYNAMIC_TERMINAL                                     | *true / false*<br/>If *true* is selected, the terminal is not linked to a single POS. When by card at the checkout, the cashier is asked which terminal should be used. This can be usefull, if you use CCO on a tablet and the POS has not a fixed location in the store.<br/><br/>*Note: The API Key has also be provided.*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ADYEN_ACTIVATE_UNREFERENCED_REFUNDS                                 | *true / false*<br/>Handles refunds only allowed with a referenced payment from an older receipt. This has to be activated by Adyen. Please consult your Adyen contact person.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ADYEN_API_KEY                                                       | *XSA2342FEFASFEF*<br/>This can be created in your Adyen backend in the section *Developers / API credentials*.<br/><br/>*Note*: The permission to use the terminal management API has to be activated by Adyen. Please consult your Adyen contact.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ADYEN_CARD_MAPPING<br/>![](resources/4200-Credit_Cards_small.png)   | *mc=3;amex=1;visa=2;visa_applepay=2;maestro=5*<br/>The adyen terminal will respond with an alphanumeric code as represenation for the card being used. The codes can be found [here](https://docs.adyen.com/development-resources/paymentmethodvariant/). This alphanumeric code has to be mapped to a specific credit card in CCO. <br/>The mapping works with an imaginary wildcard. This means, if you want to map all visa payment methods to CCO card 2 except visa_applepay and visabusiness, the mapping for visa could look like this:<br/><br/>visa=2;visa_applepay=3;visabusiness=5                                                                                                                                                                                                                                                               |
+| ADYEN_CARD_MAPPING<br/>![](resources/4200-Credit_Cards_small.png)   | *mc=3;amex=1;visa=2;visa_applepay=2;maestro=5*<br/>The Adyen terminal will respond with an alphanumeric code as represenation for the card being used. The codes can be found [here](https://docs.adyen.com/development-resources/paymentmethodvariant/). This alphanumeric code has to be mapped to a specific credit card in CCO. <br/>The mapping works with an imaginary wildcard. This means, if you want to map all visa payment methods to CCO card 2 except visa_applepay and visabusiness, the mapping for visa could look like this:<br/><br/>visa=2;visa_applepay=3;visabusiness=5                                                                                                                                                                                                                                                               |
 | ADYEN_COMPANY_ACCOUNT                                               | samplecompany<br/>The ID of your company. Seen in the Adyen Backend.<br/>![](resources/6000-Company_Merchant_Account.png)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | ADYEN_CREATE_NEW_ABSTRACT_PAYMENT_ITEM                              | *true / false*<br/>If false is selected, after a failed card payment, the cashier can choose a different payment method for the next try e.g. cash. If true is selected, the plugin will automatically add a new payment item of type card payment to retry the payment on the terminal.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ADYEN_EXCLUDE_CARD_IDS                                              | *1;1337;9234*<br/>Codes of CCO credit cards, that should not be handled by the adyen terminal.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ADYEN_EXCLUDE_CARD_IDS                                              | *1;1337;9234*<br/>Codes of CCO credit cards, that should not be handled by the Adyen terminal.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | ADYEN_FALLBACK_CARD                                                 | *3*<br/>Indicates which credit card should be used, if the terminal responds with a payment method which is not mapped in ADYEN_CARD_MAPPING.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| ADYEN_FALLBACK_SERIAL_NUMBER                                        | *AMS1-00000000000000000*<br/>Serial number of the payment terminal which is used when ADYEN_ACTIVATE_DYNAMIC_TERMINAL is set to false.<br/><br/>*Note: The serial number of the terminal is visible in the adyen backend. It's **not** the serial number printed on the device itself!*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ADYEN_FALLBACK_SERIAL_NUMBER                                        | *AMS1-00000000000000000*<br/>Serial number of the payment terminal which is used when ADYEN_ACTIVATE_DYNAMIC_TERMINAL is set to false.<br/><br/>*Note: The serial number of the terminal is visible in the Adyen backend. It's **not** the serial number printed on the device itself!*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ADYEN_FALLBACK_TERMINAL                                             | https://192.168.13.37<br/>Specifies the IP address of the payment terminal which is used when ADYEN_ACTIVATE_DYNAMIC_TERMINAL is set to false.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | ADYEN_IS_TEST_ENV                                                   | *true* / false<br/>Set this property according to the intended use.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | ADYEN_KEY_IDENTIFIER<br/>ADYEN_KEY_PASSPHRASE<br/>ADYEN_KEY_VERSION | IDENTIFIER<br/>PASSPHRASE<br/>1<br/>This parameters can be configured either on store level or on terminal level. E.g. go to *In- person payments / Stores  / Integrations* or *In-person payments / Terminals / Integrations*<br/><br/>*Note: For the sake of security please use a generated Identifier and Passphrase and treat them like passwords!*<br/><br/>*Note: When using the ADYEN_DYNAMIC_TERMINAL_CHOICE feature all terminals in one store need to use the same values! Therefore it is recommended to configure this on store level rather than terminal level.*                                                                                                                                                                                                                                                                             |
 | ADYEN_MERCHANT_ACCOUNT                                              | *SampleMerchant*<br/>Select your corresponding merchant account Id.<br/>![](resources/6000-Company_Merchant_Account.png)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ADYEN_PAYMENT_REFERENCE_PATTERN                                     | *${cco_prefix}*<br/>You can configure how the merchant reference should look like. You can see this in the adyen backend *transactions / payments* in column *Merchant reference*. This can become handy if you need IDs from CCO for mapping payments in your ERP system. <br/><br/>Possible placeholder:<br/>*cco_prefix* - Your CCO prefix<br/>*receipt_id* - Your CCO receipt id<br/>*transaction_amount* - The amount for the payment transaction<br/>*transaction_currency* - The currency for the payment transaction<br/>*transaction_timestamp* - The timestamp of the transaction<br/>*terminal_serial_number* - The serial number of the terminal used<br/>*terminal_display_label* - The configured display label of the terminal<br/><br/>*Note: The string can be max. 80 characters. Any characters exceeding this will not be transferred.* |
+| ADYEN_PAYMENT_REFERENCE_PATTERN                                     | *${cco_prefix}*<br/>You can configure how the merchant reference should look like. You can see this in the Adyen backend *transactions / payments* in column *Merchant reference*. This can become handy if you need IDs from CCO for mapping payments in your ERP system. <br/><br/>Possible placeholder:<br/>*cco_prefix* - Your CCO prefix<br/>*receipt_id* - Your CCO receipt id<br/>*transaction_amount* - The amount for the payment transaction<br/>*transaction_currency* - The currency for the payment transaction<br/>*transaction_timestamp* - The timestamp of the transaction<br/>*terminal_serial_number* - The serial number of the terminal used<br/>*terminal_display_label* - The configured display label of the terminal<br/><br/>*Note: The string can be max. 80 characters. Any characters exceeding this will not be transferred.* |
 | ADYEN_STORE_ID                                                      | *A15*<br/>The ID of the store in which the terminal was boarded.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | ADYEN_TERMINAL_CONNECTION_TIMEOUT                                   | *10000*<br/>Value in milliseconds how long the plugin will wait for a connection. If you experience slow network connections in your store, please adjust this timeout accordingly.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | ADYEN_TERMINAL_READ_TIMEOUT                                         | *120000*<br/>Value in milliseconds how long the terminal will wait for the shoppers card to be presented.<br/><br/>*Note: The processing time of a payment transaction is included into this timeout. This means the timeout will also occur, if the card was presented at ms 119999 and the processing takes > 1 ms.*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | ADYEN_PRINT_KEY_FILTER                                              | The terminal will send the merchant and customer payment receipt in a key-value structure. By providing unwanted keys spearated with semicolon, you can hide certain info on the print out. <br/><br/><br/>Available keys can be found [here](https://docs.adyen.com/point-of-sale/basic-tapi-integration/generate-receipts/)<br/><br/>*aid*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | ADYEN_USE_TAP_TO_PAY                                                | Flag to activate the Tap2Pay Feature                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | ADYEN_PAYMENT_APP_INSTALLATION_ID                                   | Don't set this field. It will be automatically set when the payment app is boarded                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ADYEN_BOARD_PAYMENT_APP_ON_STORE_LEVEL                              | Set this flag if the adyen payments app should be boarded on store level.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ADYEN_BOARD_PAYMENT_APP_ON_STORE_LEVEL                              | Set this flag if the Adyen payments app should be boarded on store level.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | ADYEN_KEY_STORE_FILE_PATH                                           | Will be set automatically with the first startup. Change only if needed!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ADYEN_KEY_STORE_PASSWORD                                            | Will be set automatically initially to "changeit". Please consider changing it in a production environment!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | ADYEN_USE_CLOUD_CONNECTION                                          | Set to true, if you want to use Cloud Connection feature.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -154,12 +154,12 @@ Restart your CCO instance after the config. If any mandatory plugin property is 
 
 ### Dynamic Terminal Choice
 
-The dynamic terminal choice feature allows the cashier to dynamically select an active adyen terminal on store level.
+The dynamic terminal choice feature allows the cashier to dynamically select an active Adyen terminal on store level.
 In a mobile POS setup, this allows the cashier to work without having to carry a payment terminal, and instead use whichever terminal is currently available nearby.
 Or you could share one terminal for multiple CCO instances. Cashiers can select a standard terminal for all upcoming payment transactions until logout or removed manually.  
 The manual selection or removing can be achieved with the documented quickselection buttons.
 
-To use the dynamic terminal choice feature, the Adyen API key needs to have the following roles. Some may only be activated by adyen itself.  
+To use the dynamic terminal choice feature, the Adyen API key needs to have the following roles. Some may only be activated by Adyen itself.  
 Please consult your contact person. 
   
   
@@ -197,12 +197,12 @@ Add a new quickselection button in CCO Manager and add the following string into
 ## Tap2Pay (Android)
 
 With Version 1.3.0 you can use the Tap2Pay feature on android. Contact Adyen to activate the Tap2Pay functionality for your account.  
-For further info please consult the official adyen docs [here](https://docs.adyen.com/point-of-sale/mobile-android/build/payments-app/).  
-To get SAP Customer Checkout running on android, please contact [Michael Bosch](https://checkout-peak.com/how-to-use-sap-customer-checkout-on-android/) to obtain his CCO-Peak.
+For further info please consult the official Adyen docs [here](https://docs.adyen.com/point-of-sale/mobile-android/build/payments-app/).  
+To get SAP Customer Checkout running on android, please contact [hokona](mailto://info@hokona.de) to obtain their CCO on Android solution.
 
 ### Prerequisites
 
-* Install the adyen payments (test) app via the Google Play Store
+* Install the Adyen payments (test) app via the Google Play Store
 * have a SAP CCO running on android
 * have file system access to the android device.
 * Ensure Android USB-Debugging is off
@@ -211,13 +211,13 @@ To get SAP Customer Checkout running on android, please contact [Michael Bosch](
 
 ### Boarding Process
 
-* After the installation of the adyen payments (test) app please open it once.
+* After the installation of the Adyen payments (test) app please open it once.
 * Ensure the following plugin properties have been set correctly
     * Company Account
     * Merchant Account
-    * Key Identifier 
-    * Key Passphrase
-    * Key version
+    * Key Identifier (use the one set at store-level)
+    * Key Passphrase (same as above)
+    * Key version (same as above)
     * API Key
     * Keystore file path
     * Keystore password
@@ -239,11 +239,11 @@ To get SAP Customer Checkout running on android, please contact [Michael Bosch](
     * When the Adyen payment (test) app is now opened it should show a screen "Ready to accept payments".
     * Note: In some cases it was necessary to close the payment app and open it again after boarding otherwise no payment was possible
     * Note: In some cases it was also necessary to restart CCO
-    * Note: In some cases it was also necessary to clear the App Cache of the adyen payment (test) app
+    * Note: In some cases it was also necessary to clear the App Cache of the Adyen payment (test) app
 
 ### Unboarding Process
 
-In case you want to unboard a boarded adyen payment app, please use the following flow:
+In case you want to unboard a boarded Adyen payment app, please use the following flow:
 
 * Click on unboard app button
     * No app switch will occur, the app will not accept payment transactions anymore
@@ -271,7 +271,7 @@ Cloud Connection enables the use of the terminal as usual, even if it's not conn
     * Company Account
     * Merchant Account
     * Store ID (if dynamic terminal choice is enabled)
-    * Identifier (can be a user-defined value which matches adyens requirements, is needed for a secure and encrypted communication between CCO and adyen)
+    * Identifier (can be a user-defined value which matches Adyen's requirements, is needed for a secure and encrypted communication between CCO and Adyen)
     * Passphrase (same applies to this)
     * Key version (numerical value, can be set to 1 or any user-defined value)
     * Fallback terminal serial number (if dynamic terminal choice is disabled)
@@ -331,7 +331,7 @@ provided adyenplugin-1.0.24-FP16 - suitable for CCO FP16 & FP17
 
 * Improvement: Actual values of card payments are now entered automatically. Thus, there should be no discrepancies in the daily closing.  
 * Improvement: Chosen standard terminal will be saved even after cashier logged out once.
-* Improvement: Return of a receipt with copied payment item which was originally paid with adyen will now open the terminal choice dialog if dynamic terminal choice is active.  
+* Improvement: Return of a receipt with copied payment item which was originally paid with Adyen will now open the terminal choice dialog if dynamic terminal choice is active.  
 * Improvement: Card mapping works now like a regex. E.g. visadebit, visa, visacredit, visa_applepay... will now be mapped with a single visa=2  
   If visacredit should be mapped to another CCO card, this can be done with visa=2;visacredit=23
 * Bugfix: Changing the CreditCardTypeCode could lead to an error in cashdesk closing when receipts were already posted with this card.
