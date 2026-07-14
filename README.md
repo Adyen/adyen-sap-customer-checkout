@@ -14,6 +14,79 @@ With Version 1.1.1 of the plugin SAP CCO FP16 and FP17 is not supported anymore.
   
 With Version 1.3.1 the Adyen SAP CCO Integration requires Java 17!
 
+## Table of Content
+* [Supported Features](#supported-features)
+* [Prerequisites](#prerequisites)
+* [Installation and Configuration](#installation-and-configuration)
+  * [Plugin Installation](#plugin-installation)
+    * [Changing certificates in Java Keystore](#changing-certificates-in-java-keystore)
+      * [Certificates to be imported](#certificates-to-be-imported)
+      * [Prerequisites](#prerequisites-1)
+      * [Steps to import or Update certificates](#steps-to-import-or-update-certificates)
+        * [Windows & macOS](#windows--macos)
+  * [Adding a store in Adyen backend](#adding-a-store-in-adyen-backend)
+  * [Terminal configuration](#terminal-configuration)
+  * [SAP Customer Checkout Configuration](#sap-customer-checkout-configuration)
+  * [Plugin Configuration](#plugin-configuration)
+  * [Dynamic Terminal Choice](#dynamic-terminal-choice)
+  * [Quickselection Buttons](#quickselection-buttons)
+    * [Standard Terminal Choice](#standard-terminal-choice)
+    * [Remove Standard Terminal](#remove-standard-terminal)
+* [Tap2Pay (Android)](#tap2pay-android)
+  * [Prerequisites](#prerequisites-2)
+  * [Boarding Process](#boarding-process)
+  * [Unboarding Process](#unboarding-process)
+  * [Quickselection Buttons](#quickselection-buttons-1)
+* [Cloud Connection](#cloud-connection)
+  * [Prerequisites](#prerequisites-3)
+  * [Notes on Payments](#notes-on-payments)
+* [Tokenization (Card on File)](#tokenization-card-on-file)
+  * [Configuration](#configuration)
+    * [Recurring Processing Model](#recurring-processing-model)
+  * [Mandate Mode](#mandate-mode)
+  * [0-Euro Tokenization](#0-euro-tokenization)
+    * [Customer Lookup](#customer-lookup)
+    * [Prerequisites](#prerequisites-4)
+  * [Subscription Tokenization](#subscription-tokenization)
+    * [Configuration](#configuration-1)
+    * [How it works](#how-it-works)
+      * [Non-Zero Amount Receipts](#non-zero-amount-receipts)
+      * [Zero-Amount Receipts (0-Euro Subscription)](#zero-amount-receipts-0-euro-subscription)
+      * [Split Payment Restriction](#split-payment-restriction)
+* [Pre-Authorization (Hotels / Car Rentals)](#pre-authorization-hotels--car-rentals)
+  * [Configuration](#configuration-2)
+  * [How it works](#how-it-works-1)
+  * [Cross-Register Flow](#cross-register-flow)
+  * [Auto-Capture on Receipt Posting](#auto-capture-on-receipt-posting)
+  * [Auto-Cancel on Storno (Void)](#auto-cancel-on-storno-void)
+  * [Manual Events](#manual-events)
+  * [PaymentTransactionDetail Keys](#paymenttransactiondetail-keys)
+  * [Void Protection](#void-protection)
+  * [Notes](#notes)
+  * [Quick selection buttons](#quick-selection-buttons)
+* [Signature Capture](#signature-capture)
+  * [Receipt-driven signature](#receipt-driven-signature)
+  * [Translations](#translations)
+* [Troubleshooting](#troubleshooting)
+  * [Error Codes](#error-codes)
+* [changelog](#changelog)
+
+## Supported Features
+
+* Card payments via Adyen terminals in SAP Customer Checkout
+  * Payments
+  * Split-Payments
+  * Referenced and Unreferenced Refunds including threshold definition
+  * Tipping
+  * Cash desk closing – autofill card values
+  * multi-currency handling
+  * customizable merchant reference
+* Dynamic terminal selection for shared POS setups
+* Tap2Pay on Android with the Adyen payments app
+* Recurring payments, mandate mode, and 0-Euro tokenization
+* Pre-Auth with Cross-register flow, auto-capture, auto-cancel, and void protection
+* receipt-driven signature, and translation support
+
 ## Prerequisites
 
 ___
@@ -31,7 +104,7 @@ ___
 
  **<span style="color:red">Prior to version 1.1.0</span>** 
 
-Download the Adyen certificates from [here]((https://docs.adyen.com/point-of-sale/design-your-integration/choose-your-architecture/local/#install-root-cert)), rename them as shown and place them also in the AP folder.
+Download the Adyen certificates from [here]((https://docs.adyen.com/point-of-sale/design-your-integration/choose-your-architecture/local/#install-root-cert)), rename them as shown, and place them also in the AP folder.
 
 ![](resources/1000-AP_folder_with_certificates.png)
 
@@ -110,7 +183,7 @@ Connect your terminal to your local network. Either with LAN or via Wifi. Please
 
 ### SAP Customer Checkout Configuration
 
-Start your SAP CCO instance, login as User with administrative privileges and go to the configuration backend. In the tab *Accounting* open the subtab *Credit Card Type*.
+Start your SAP CCO instance, login as User with administrative privileges, and go to the configuration backend. In the tab *Accounting* open the subtab *Credit Card Type*.
 
 ![](resources/4000-Credit_Card_Type.png)
 
@@ -172,7 +245,7 @@ Please consult your contact person.
 
 Some restrictions may apply:
 
-* Key identifier, passphrase and key version must be the same on store level for all terminals
+* Key identifier, passphrase, and key version must be the same on store level for all terminals
 
 
 ### Quickselection Buttons
@@ -261,11 +334,11 @@ Unboard app:
 
 `"event" : { "eventName" : "ADY_UNBOARD_PAYMENT_APP" }`
 
-# Cloud Connection
+## Cloud Connection
 
 Cloud Connection enables the use of the terminal as usual, even if it's not connected to the same Wi-Fi as CCO.
 
-## Prerequisites
+### Prerequisites
 
 * Ensure that the following plugin properties have been set correctly
     * Company Account
@@ -283,9 +356,231 @@ Cloud Connection enables the use of the terminal as usual, even if it's not conn
     * Use Cloud Connection
     * Cloud Endpoint
 
-## Notes on Payments
+### Notes on Payments
 
 The entire user flow for Cloud Connection is the same as for Local Terminal, including dynamic terminal choice.
+
+## Tokenization (Card on File)
+
+Enables saving card tokens during payment for later use (recurring payments, card-on-file).
+
+### Configuration
+
+| Property                                  | Type    | Default          | Description                                                               |
+|-------------------------------------------|---------|------------------|---------------------------------------------------------------------------|
+| `ADYEN_ENABLE_TOKENIZATION`               | Boolean | false            | Enable tokenization during payments                                       |
+| `ADYEN_RECURRING_PROCESSING_MODEL`        | String  | CardOnFile       | Processing model (see table below)                                        |
+| `ADYEN_SHOPPER_REFERENCE_PATTERN`         | String  | {receiptId}      | Pattern for unique shopper reference. Placeholder: `{receiptId}`          |
+
+#### Recurring Processing Model
+
+| Value                   | Description                                                                                                                                   | Example                                                                       |
+|-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| `CardOnFile`            | Customer stores card for future customer-initiated purchases. Default for POS scenarios.                                                      | Regular customer pays with stored card on each visit                          |
+| `Subscription`          | Merchant charges a fixed amount on a regular schedule (subscription model). Follow-up charges run server-to-server, not through the terminal. | Monthly pass: first payment at the terminal, then monthly charges via backend |
+| `UnscheduledCardOnFile` | Merchant charges at irregular intervals without a fixed schedule. Also server-to-server.                                                      | Damage charges, pay-per-use                                                   |
+
+**Important:** For `Subscription` and `UnscheduledCardOnFile`, the plugin only covers the **entry point** — the card is tokenized at the terminal and the token (
+`storedPaymentMethodId`) is stored in the `PaymentTransactionDetail`. **Follow-up charges** must be handled by a separate backend system that uses the token and calls Adyen's
+eCommerce API (`/payments`). The plugin itself does not execute recurring payments.
+
+For pure POS scenarios without recurring charges, `CardOnFile` is the correct choice.
+
+### Mandate Mode
+
+The cashier can activate "Mandate Mode" via the `ADY_SET_MANDATE_MODE` event before a card payment. When active, the next card payment will include tokenization data
+(shopperReference + recurringProcessingModel), creating a token for that card. The mode is reset automatically after the payment.
+
+````json
+"event": {"eventName": "ADY_SET_MANDATE_MODE"}
+````
+
+### 0-Euro Tokenization
+
+Use the "Tokenize Card" button (event `ADY_PERFORM_CARD_ACQUISITION`) to tokenize a card without a payment.
+This sends a CardAcquisition request with TotalAmount=0 — no money is moved and nothing appears on the customer's bank statement.
+
+#### Customer Lookup
+
+After a successful card acquisition (or tokenized payment), the plugin automatically looks up the card alias in the customer database. A customer is recognized when the card alias is stored in the UDF field `udfString1` of the customer master data. The plugin never writes this field — storing the alias on the customer is up to a downstream process (e.g. the backend that consumes the posted receipts) or manual maintenance.
+
+- **Single match** — the customer is automatically assigned to the receipt
+- **Multiple matches** — the cashier is prompted to select the correct customer. Card acquisition only: during a payment the receipt posts immediately afterward, so no selection is possible and only a message is shown.
+- **No match** — an info message is shown
+
+#### Prerequisites
+
+- Enable "Recurring details" in Adyen Customer Area > Developers > Additional data
+### Subscription Tokenization
+
+Enables automatic card tokenization when receipts contain items from specific article groups. This covers the use case where a customer purchases a subscription product at the POS
+and their card needs to be tokenized for future recurring charges.
+
+#### Configuration
+
+| Property                                       | Type   | Default | Description                                                                                                     |
+|------------------------------------------------|--------|---------|-----------------------------------------------------------------------------------------------------------------|
+| `ADYEN_SUBSCRIPTION_GROUPS_CARD_ON_FILE`       | String | (empty) | Article group IDs (`;`-separated) that trigger CardOnFile tokenization                                          |
+| `ADYEN_SUBSCRIPTION_GROUPS_SUBSCRIPTION`       | String | (empty) | Article group IDs (`;`-separated) that trigger Subscription tokenization                                        |
+| `ADYEN_SUBSCRIPTION_GROUPS_UNSCHEDULED`        | String | (empty) | Article group IDs (`;`-separated) that trigger UnscheduledCardOnFile tokenization                               |
+
+#### How it works
+
+When a receipt contains items from a configured subscription article group, the plugin detects this and acts depending on the receipt amount:
+
+##### Non-Zero Amount Receipts
+
+The card payment automatically includes tokenization data (shopperReference + recurringProcessingModel). The token is returned in the payment response and stored on the
+PaymentItem. If the article group is configured for subscription, a signature consent prompt is shown on the terminal before the payment.
+
+##### Zero-Amount Receipts (0-Euro Subscription)
+
+When the receipt total is zero (e.g., free trial, promotional subscription), the plugin runs a dedicated flow on receipt posting:
+
+1. **Consent capture** — signature on the terminal. If declined, the receipt posting is blocked.
+2. **Card acquisition** — a CardAcquisition request tokenizes the card without moving money.
+3. **Token storage** — the token data (`TOKENIZATION_ALIAS`, `TOKENIZATION_SHOPPER_REFERENCE`, `TOKENIZATION_STORED_PAYMENT_METHOD_ID`) is stored as additional fields on the posted receipt, where a downstream system can pick it up. Note the difference to tokenized payments: there the token data is stored as payment transaction details on the payment item — a zero-amount receipt has no payment item, hence the receipt fields.
+
+After the card acquisition completes, the terminal is released back to idle with a positive confirmation animation.
+
+##### Split Payment Restriction
+
+Split payments are not allowed for subscription receipts. The full amount must be paid with a single card payment to ensure tokenization covers the correct card.
+
+## Pre-Authorization (Hotels / Car Rentals)
+
+Blocks an amount on a card without capturing it. The pre-authorization does **not** create a fiscal receipt. The receipt is parked (PARKED status) and can be resumed at any
+register for capture.
+
+### Configuration
+
+| Property                | Type    | Default | Description                   |
+|-------------------------|---------|---------|-------------------------------|
+| `ADYEN_ENABLE_PRE_AUTH` | Boolean | false   | Enable pre-authorization mode |
+
+### How it works
+
+`ADYEN_ENABLE_PRE_AUTH` enables the pre-authorization **capability** — it does **not** make all payments pre-authorizations. Normal card payments continue to work as before. The
+cashier must explicitly activate pre-auth mode before each pre-auth payment.
+
+### Cross-Register Flow
+
+**Register A — Reservation (PreAuth):**
+
+1. Create receipt and add items
+2. Click the **"PreAuth"** button (`ADY_SET_PREAUTH_MODE`) — a confirmation message appears
+3. Pay with card — only this payment is sent as a pre-authorization (`authorisationType=PreAuth`)
+4. A message shows the Receipt ID — **park the receipt** (no fiscal document)
+
+**Register B — Checkout:**
+
+1. Resume the parked receipt (CCO's "Resume Parked Receipt" function)
+2. Optionally adjust items (add/remove)
+3. Post the receipt — the plugin automatically handles capture (see below)
+
+**Note:** If the cashier does NOT click the PreAuth button, the card payment is processed normally (immediate capture). The pre-auth flag is automatically reset after each
+payment (success or failure).
+
+### Auto-Capture on Receipt Posting
+
+When a receipt with an active pre-authorization (`AUTHORIZED` status) is posted, the plugin **automatically captures** the pre-auth via the Adyen Checkout API. No manual
+`ADY_PREAUTH_CAPTURE` event is needed for the standard flow.
+
+The plugin handles amount differences between the reserved amount and the final receipt total:
+
+| Scenario | Behavior |
+|----------|----------|
+| Receipt total = reserved amount | Full capture at the original amount |
+| Receipt total < reserved amount | PaymentItem amount is aligned down to the receipt total. Adyen captures the lower amount and automatically releases the remainder. |
+| Receipt total > reserved amount | PaymentItem stays at the reserved amount. The cashier pays the difference with a second payment (cash or another card). The pre-auth is captured at the original reserved amount. |
+
+A success or failure message is shown to the cashier after the capture API call completes.
+
+### Auto-Cancel on Storno (Void)
+
+When a receipt with an active pre-authorization is voided (storniert), the plugin **automatically cancels** the pre-auth at Adyen before the void proceeds.
+
+- If the cancel succeeds → the void continues, and a success message is shown
+- If the cancel fails → the void is **blocked**, an error message is shown, and the cashier can retry. This prevents a receipt from being voided while money is still reserved on the card.
+
+When a single pre-auth PaymentItem is voided (not the full receipt), the same cancel logic applies but does not block the void on failure — a warning is shown instead.
+
+### Manual Events
+
+These events can still be used for manual control, e.g., for adjustments or explicit capture/cancel on parked receipts before posting.
+
+| Event                  | Payload               | Description                                                                               |
+|------------------------|-----------------------|-------------------------------------------------------------------------------------------|
+| `ADY_SET_PREAUTH_MODE` | —                     | Activate pre-auth for the **next** card payment only. Resets automatically after payment. |
+| `ADY_PREAUTH_ADJUST`   | `{receiptId, amount}` | Change the blocked amount. `receiptId` is auto-injected from current receipt if omitted.  |
+| `ADY_PREAUTH_CAPTURE`  | `{receiptId}`         | Capture (charge) the pre-authorized amount. `receiptId` auto-injected.                    |
+| `ADY_PREAUTH_CANCEL`   | `{receiptId}`         | Release the blocked amount. `receiptId` auto-injected.                                    |
+
+### PaymentTransactionDetail Keys
+
+| Key                       | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| `PREAUTH_PSP_REFERENCE`   | Adyen PSP reference for the pre-auth                |
+| `PREAUTH_STATUS`          | Lifecycle: `AUTHORIZED` → `CAPTURED` or `CANCELLED` |
+| `PREAUTH_TIMESTAMP`       | ISO-8601 timestamp of the pre-auth                  |
+| `PREAUTH_ORIGINAL_AMOUNT` | Blocked amount (plain decimal, updated on adjust)   |
+| `PREAUTH_CURRENCY`        | Currency code (e.g., EUR)                           |
+
+### Void Protection
+
+A pre-auth PaymentItem cannot be voided once it has been `CAPTURED` — the money is already collected. The cashier will see an error message if they attempt to void such a PaymentItem.
+
+After a manual pre-auth cancel (`ADY_PREAUTH_CANCEL`) the reserved amount is released at Adyen, but the payment item stays on the receipt. Such a receipt can **not** be posted anymore — the cashier must void the receipt. The manual cancel is meant for releasing the reservation while keeping the receipt around for review before voiding it.
+
+### Notes
+
+- At least 5 seconds must pass between pre-auth and first adjustment (Adyen requirement).
+- Pre-authorizations expire after 7-30 days depending on card scheme (Visa 5-30 days, Mastercard 30 days, Amex 7 days).
+- If the auto-capture fails after posting, the receipt is already committed. A critical error is logged and the cashier is notified. Manual capture via the Adyen Customer Area is required.
+- On the Adyen **test environment**, captured pre-auths may remain at `SentForSettle` status instead of transitioning to `Settled` immediately (unlike auto-captured terminal payments). This is expected — the test environment does not fully simulate bank settlement batches for manual captures. On production, settlement follows the normal acquirer batch cycle (1-2 business days).
+
+### Quick selection buttons
+
+````json
+"event": {"eventName": "ADY_SET_PREAUTH_MODE"}
+````
+
+````json
+"event": {"eventName": "ADY_PREAUTH_ADJUST"}
+````
+
+````json
+"event": {"eventName": "ADY_PREAUTH_CAPTURE"}
+````
+
+````json
+"event": {"eventName": "ADY_PREAUTH_CANCEL"}
+````
+
+## Signature Capture
+
+Captures a customer signature on the Adyen terminal display. Can be triggered standalone via a button or used internally by other features (e.g., subscription consent).
+
+````json
+"event": {"eventName": "ADY_PERFORM_SIGNATURE"}
+````
+
+The event accepts optional payload parameters:
+
+| Parameter       | Type   | Default                                     | Description                           |
+|-----------------|--------|---------------------------------------------|---------------------------------------|
+| `saleId`        | String | SIG-{timestamp}                             | Identifier for the signature session  |
+| `signatureText` | String | `ADYEN_SIGNATURE_FIELD_TEXT` (translation)  | Text displayed above the signature field |
+| `timeout`       | Number | 120                                         | Timeout in seconds                    |
+
+The signature data is returned as a Base64-encoded image and broadcast via `ADY_SHOPPER_SIGNATURE` event for further processing by the frontend.
+
+**Note:** The permanent text (slogan) displayed on the terminal's signature screen is configured in the Adyen Customer Area under the terminal's Signature settings (Device Slogan). It is not managed by the plugin.
+
+### Receipt-driven signature
+
+For receipt-bound signature capture (before payment or as part of the tokenization flow), set the `ADY_TRIGGER_SIGNATURE` or `ADY_TRIGGER_TOKENIZATION_WITH_SIGNATURE` field on the receipt header or a sales item, optionally with `ADY_SIGNATURE_DISPLAY_TEXT` to customise the on-screen text. See [Additional Field Triggers](#additional-field-triggers).
+
 
 ### Translations
 
