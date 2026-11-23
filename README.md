@@ -1,10 +1,47 @@
-# Adyen SAP Customer Checkout
+<table>
+<thead>
+<tr><th>❗ IMPORTANT NOTICE</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>
 
-___
+**2026-11-23 – Update**: The issues with local terminal connections on SAP Machine versions above 17.0.16 have been isolated to security settings that changed in newer JRE versions. They only affect older terminals, e.g. Verifone P400 or V400m. If you are running an affected SAP Machine version and experience connection problems with such a terminal, apply one of the following workarounds:
 
-| :exclamation:  IMPORTANT NOTICE   |
-|----------------------------------------------|
- **2026-07-09**: We're currently experiencing issues with local terminal connections when using a new SAP Machine version above 17.0.16. To be on the safe side: Do NOT update until further notice. 
+**Option 1:** In `$JAVA_HOME/conf/security/java.security`, remove `TLS_RSA_*` from `jdk.tls.disabledAlgorithms`.
+
+Change
+
+```
+jdk.tls.disabledAlgorithms=SSLv3, TLSv1, TLSv1.1, DTLSv1.0, RC4, DES, \
+    MD5withRSA, DH keySize < 1024, EC keySize < 224, 3DES_EDE_CBC, anon, NULL, \
+    ECDH, TLS_RSA_*, rsa_pkcs1_sha1 usage HandshakeSignature, \
+    ecdsa_sha1 usage HandshakeSignature, dsa_sha1 usage HandshakeSignature
+```
+
+to
+
+```
+jdk.tls.disabledAlgorithms=SSLv3, TLSv1, TLSv1.1, DTLSv1.0, RC4, DES, \
+    MD5withRSA, DH keySize < 1024, EC keySize < 224, 3DES_EDE_CBC, anon, NULL, \
+    ECDH, rsa_pkcs1_sha1 usage HandshakeSignature, \
+    ecdsa_sha1 usage HandshakeSignature, dsa_sha1 usage HandshakeSignature
+```
+
+**Option 2:** Copy the `java.security` file to a separate location, apply the change above to the copy, and pass it to the JVM in the `run.bat`:
+
+```
+-Djava.security.properties=/path/to/java.security
+```
+
+> **Note:** This workaround re-enables the `TLS_RSA_*` cipher suites, which newer JRE versions disable by default for security reasons. Only apply it on systems that use affected terminals.
+
+**2026-07-09**: We're currently experiencing issues with local terminal connections when using a new SAP Machine version above 17.0.16. To be on the safe side: Do NOT update until further notice.
+
+</td>
+</tr>
+</tbody>
+</table>
 
 **<span style="color:red">IMPORTANT CHANGES</span>**
 
